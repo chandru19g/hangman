@@ -1,0 +1,176 @@
+import 'package:date_format/date_format.dart';
+import 'package:flutter/material.dart';
+import 'package:hangman/ui/themes.dart';
+
+class ScoreScreen extends StatelessWidget {
+  final dynamic query;
+
+  const ScoreScreen({Key? key, required this.query}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: query.length == 0
+            ? Stack(
+                children: [
+                  const Center(
+                    child: Text(
+                      "No Scores Yet!",
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(6.0, 10.0, 6.0, 15.0),
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.home),
+                      iconSize: 35.0,
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      Container(
+                        padding:
+                            const EdgeInsets.fromLTRB(6.0, 10.0, 6.0, 15.0),
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          iconSize: 35,
+                          icon: const Icon(Icons.home),
+                          highlightColor: Colors.transparent,
+                          splashColor: Colors.transparent,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      Center(
+                        child: Container(
+                          margin:
+                              const EdgeInsets.fromLTRB(8.0, 10.0, 8.0, 15.0),
+                          child: const Text(
+                            'High Scores',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 45.0,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Table(
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: _createRow(query),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  List<TableRow> _createRow(var query) {
+    List<TableRow> rows = [];
+    rows.add(
+      const TableRow(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 15.0),
+            child: Center(
+              child: Text(
+                "Rank",
+                style: highScoreTableHeaders,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 15.0),
+            child: Center(
+              child: Text(
+                "Date",
+                style: highScoreTableHeaders,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 15.0),
+            child: Center(
+              child: Text(
+                "Score",
+                style: highScoreTableHeaders,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    int numOfRows = query.length;
+    List<String> topRanks = ["🥇", "🥈", "🥉"];
+    for (var i = 0; i < numOfRows && i < 10; i++) {
+      var row = query[i].toString().split(",");
+      var date = row[1].split(" ")[1].split("-");
+      var scoreDate = formatDate(
+          DateTime(int.parse(date[0]), int.parse(date[1]), int.parse(date[2])),
+          [yy, '-', M, '-', d]);
+
+      Widget item = TableCell(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            i < 3 ? topRanks[i] + '${i + 1}' : '${i + 1}',
+            style: highScoreTableRowsStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      Widget item1 = TableCell(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              scoreDate,
+              style: highScoreTableRowsStyle,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+      Widget item2 = TableCell(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            row[0],
+            style: highScoreTableRowsStyle,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      rows.add(
+        TableRow(
+          children: [item, item1, item2],
+        ),
+      );
+    }
+    return rows;
+  }
+}
